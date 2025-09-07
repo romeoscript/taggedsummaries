@@ -8,9 +8,11 @@ import type { AIProcessingResult } from './services/groqService';
 import './App.css';
 
 function App() {
-  const [groqApiKey, setGroqApiKey] = useState('');
   const [aiResult, setAiResult] = useState<AIProcessingResult | null>(null);
   const [storing, setStoring] = useState(false);
+  
+  // Get Groq API key from environment variables
+  const groqApiKey = import.meta.env.VITE_GROQ_API_KEY;
 
   const handleProcessTransaction = (result: AIProcessingResult) => {
     setAiResult(result);
@@ -63,7 +65,6 @@ function App() {
             {/* Left Column */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               <WalletConnectionNew />
-              <ApiKeyInput onApiKeyChange={setGroqApiKey} />
               <TransactionInput 
                 onProcessTransaction={handleProcessTransaction}
                 groqApiKey={groqApiKey}

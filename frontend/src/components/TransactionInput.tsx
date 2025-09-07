@@ -23,8 +23,8 @@ export const TransactionInput: React.FC<TransactionInputProps> = ({
       return;
     }
 
-    if (!groqApiKey.trim()) {
-      setError('Please enter your Groq API key');
+    if (!groqApiKey || !groqApiKey.trim()) {
+      setError('Groq API key not found. Please set VITE_GROQ_API_KEY in your .env file');
       return;
     }
 
@@ -81,10 +81,10 @@ export const TransactionInput: React.FC<TransactionInputProps> = ({
 
         <button
           type="submit"
-          disabled={processing || !transactionData.trim() || !groqApiKey.trim()}
+          disabled={processing || !transactionData.trim() || !groqApiKey || !groqApiKey.trim()}
           style={{
             width: '100%',
-            backgroundColor: (processing || !transactionData.trim() || !groqApiKey.trim()) ? '#60a5fa' : '#2563eb',
+            backgroundColor: (processing || !transactionData.trim() || !groqApiKey || !groqApiKey.trim()) ? '#60a5fa' : '#2563eb',
             color: 'white',
             fontWeight: '500',
             padding: '0.5rem 1rem',

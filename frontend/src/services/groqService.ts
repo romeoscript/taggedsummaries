@@ -14,19 +14,25 @@ export class GroqAIService {
   }
 
   async extractMetadata(transactionData: string): Promise<AIProcessingResult> {
-    const prompt = `Analyze this campus transaction and extract metadata:
+    const prompt = `You are a campus transaction analyzer. Analyze this transaction and return ONLY a valid JSON object with no additional text or explanation.
 
 Transaction: "${transactionData}"
 
-Please provide a JSON response with the following structure:
+Return this exact JSON structure:
 {
-  "summary": "A concise summary of the transaction (max 100 characters)",
-  "tags": ["tag1", "tag2", "tag3", "tag4", "tag5"] (max 5 tags),
-  "category": "One of: dining, academic, transportation, entertainment, shopping, services, other",
-  "confidenceScore": 85 (confidence percentage 0-100)
+  "summary": "Brief summary (max 100 chars)",
+  "tags": ["tag1", "tag2", "tag3", "tag4", "tag5"],
+  "category": "dining|academic|transportation|entertainment|shopping|services|other",
+  "confidenceScore": 85
 }
 
-Focus on campus-related transactions. Tags should be relevant keywords like "food", "textbook", "bus", "coffee", "campus", etc.`;
+Rules:
+- Return ONLY the JSON object
+- No explanations or additional text
+- Summary max 100 characters
+- Max 5 tags
+- Category must be one of the listed options
+- Confidence score 0-100`;
 
     try {
       const response = await fetch(this.baseUrl, {
@@ -59,8 +65,22 @@ Focus on campus-related transactions. Tags should be relevant keywords like "foo
         throw new Error('No response content from Groq API');
       }
 
-      // Parse the JSON response
-      const result = JSON.parse(content);
+      console.log('Groq API response:', content);
+
+      // Try to extract JSON from the response
+      let result;
+      try {
+        // First try to parse the content directly
+        result = JSON.parse(content);
+      } catch (parseError) {
+        // If direct parsing fails, try to extract JSON from the text
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          result = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error('Could not extract valid JSON from API response');
+        }
+      }
       
       // Validate and clean the result
       return {
