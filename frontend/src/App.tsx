@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { WalletConnection } from './components/WalletConnection';
+import { WalletContextProvider } from './contexts/WalletContext';
+import { WalletConnectionNew } from './components/WalletConnectionNew';
 import { ApiKeyInput } from './components/ApiKeyInput';
 import { TransactionInput } from './components/TransactionInput';
 import { AIResult } from './components/AIResult';
 import type { AIProcessingResult } from './services/groqService';
+import './App.css';
 
 function App() {
   const [groqApiKey, setGroqApiKey] = useState('');
@@ -37,84 +39,86 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Tagged Summaries</h1>
-              <p className="text-gray-600 mt-1">AI-powered campus transaction analysis on Solana</p>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-              <span className="text-sm text-gray-600">Devnet</span>
+    <WalletContextProvider>
+      <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb' }}>
+        {/* Header */}
+        <header style={{ backgroundColor: 'white', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)', borderBottom: '1px solid #e5e7eb' }}>
+          <div style={{ maxWidth: '80rem', margin: '0 auto', padding: '0 1rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.5rem 0' }}>
+              <div>
+                <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold', color: '#111827', margin: 0 }}>Tagged Summaries</h1>
+                <p style={{ color: '#6b7280', margin: '0.25rem 0 0 0' }}>AI-powered campus transaction analysis on Solana</p>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div style={{ width: '0.75rem', height: '0.75rem', backgroundColor: '#10b981', borderRadius: '50%' }}></div>
+                <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>Devnet</span>
+              </div>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Left Column */}
-          <div className="space-y-6">
-            <WalletConnection />
-            <ApiKeyInput onApiKeyChange={setGroqApiKey} />
-            <TransactionInput 
-              onProcessTransaction={handleProcessTransaction}
-              groqApiKey={groqApiKey}
-            />
-          </div>
+        {/* Main Content */}
+        <main style={{ maxWidth: '80rem', margin: '0 auto', padding: '2rem 1rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(1, minmax(0, 1fr))', gap: '2rem' }}>
+            {/* Left Column */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <WalletConnectionNew />
+              <ApiKeyInput onApiKeyChange={setGroqApiKey} />
+              <TransactionInput 
+                onProcessTransaction={handleProcessTransaction}
+                groqApiKey={groqApiKey}
+              />
+            </div>
 
-          {/* Right Column */}
-          <div className="space-y-6">
-            <AIResult 
-              result={aiResult}
-              onStoreOnChain={handleStoreOnChain}
-              storing={storing}
-            />
-            
-            {/* Info Card */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">How it works</h3>
-              <div className="space-y-3 text-sm text-gray-600">
-                <div className="flex items-start space-x-3">
-                  <div className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-medium">1</div>
-                  <p>Connect your Phantom wallet to interact with Solana devnet</p>
-                </div>
-                <div className="flex items-start space-x-3">
-                  <div className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-medium">2</div>
-                  <p>Enter your Groq API key for AI processing</p>
-                </div>
-                <div className="flex items-start space-x-3">
-                  <div className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-medium">3</div>
-                  <p>Describe your campus transaction</p>
-                </div>
-                <div className="flex items-start space-x-3">
-                  <div className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-medium">4</div>
-                  <p>AI extracts metadata (summary, tags, category)</p>
-                </div>
-                <div className="flex items-start space-x-3">
-                  <div className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-medium">5</div>
-                  <p>Store the tagged summary on Solana blockchain</p>
+            {/* Right Column */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <AIResult 
+                result={aiResult}
+                onStoreOnChain={handleStoreOnChain}
+                storing={storing}
+              />
+              
+              {/* Info Card */}
+              <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)', border: '1px solid #e5e7eb', padding: '1.5rem' }}>
+                <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: '#111827', margin: '0 0 1rem 0' }}>How it works</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
+                    <div style={{ flexShrink: 0, width: '1.5rem', height: '1.5rem', backgroundColor: '#dbeafe', color: '#2563eb', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: '500' }}>1</div>
+                    <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: 0 }}>Connect your Phantom wallet to interact with Solana devnet</p>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
+                    <div style={{ flexShrink: 0, width: '1.5rem', height: '1.5rem', backgroundColor: '#dbeafe', color: '#2563eb', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: '500' }}>2</div>
+                    <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: 0 }}>Enter your Groq API key for AI processing</p>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
+                    <div style={{ flexShrink: 0, width: '1.5rem', height: '1.5rem', backgroundColor: '#dbeafe', color: '#2563eb', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: '500' }}>3</div>
+                    <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: 0 }}>Describe your campus transaction</p>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
+                    <div style={{ flexShrink: 0, width: '1.5rem', height: '1.5rem', backgroundColor: '#dbeafe', color: '#2563eb', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: '500' }}>4</div>
+                    <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: 0 }}>AI extracts metadata (summary, tags, category)</p>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
+                    <div style={{ flexShrink: 0, width: '1.5rem', height: '1.5rem', backgroundColor: '#dbeafe', color: '#2563eb', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: '500' }}>5</div>
+                    <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: 0 }}>Store the tagged summary on Solana blockchain</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </main>
+        </main>
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="text-center text-sm text-gray-500">
-            <p>Built with React, Vite, Tailwind CSS, and Solana</p>
-            <p className="mt-1">AI powered by Groq's Llama 3.3 70B model</p>
+        {/* Footer */}
+        <footer style={{ backgroundColor: 'white', borderTop: '1px solid #e5e7eb', marginTop: '4rem' }}>
+          <div style={{ maxWidth: '80rem', margin: '0 auto', padding: '1.5rem 1rem' }}>
+            <div style={{ textAlign: 'center', fontSize: '0.875rem', color: '#6b7280' }}>
+              <p style={{ margin: 0 }}>Built with React, Vite, and Solana</p>
+              <p style={{ margin: '0.25rem 0 0 0' }}>AI powered by Groq's Llama 3.3 70B model</p>
+            </div>
           </div>
-        </div>
-      </footer>
-    </div>
+        </footer>
+      </div>
+    </WalletContextProvider>
   );
 }
 

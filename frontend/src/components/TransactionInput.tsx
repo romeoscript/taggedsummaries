@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { GroqAIService, AIProcessingResult } from '../services/groqService';
+import { GroqAIService } from '../services/groqService';
+import type { AIProcessingResult } from '../services/groqService';
 
 interface TransactionInputProps {
   onProcessTransaction: (result: AIProcessingResult) => void;
@@ -51,12 +52,12 @@ export const TransactionInput: React.FC<TransactionInputProps> = ({
   ];
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Process Campus Transaction</h3>
+    <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)', border: '1px solid #e5e7eb', padding: '1.5rem' }}>
+      <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: '#111827', margin: '0 0 1rem 0' }}>Process Campus Transaction</h3>
       
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <div>
-          <label htmlFor="transaction" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="transaction" style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
             Transaction Description
           </label>
           <textarea
@@ -64,7 +65,15 @@ export const TransactionInput: React.FC<TransactionInputProps> = ({
             value={transactionData}
             onChange={(e) => setTransactionData(e.target.value)}
             placeholder="Enter your campus transaction details..."
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+            style={{
+              width: '100%',
+              padding: '0.5rem 0.75rem',
+              border: '1px solid #d1d5db',
+              borderRadius: '0.5rem',
+              resize: 'none',
+              outline: 'none',
+              fontSize: '0.875rem'
+            }}
             rows={3}
             disabled={processing}
           />
@@ -73,27 +82,61 @@ export const TransactionInput: React.FC<TransactionInputProps> = ({
         <button
           type="submit"
           disabled={processing || !transactionData.trim() || !groqApiKey.trim()}
-          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+          style={{
+            width: '100%',
+            backgroundColor: (processing || !transactionData.trim() || !groqApiKey.trim()) ? '#60a5fa' : '#2563eb',
+            color: 'white',
+            fontWeight: '500',
+            padding: '0.5rem 1rem',
+            borderRadius: '0.5rem',
+            border: 'none',
+            cursor: (processing || !transactionData.trim() || !groqApiKey.trim()) ? 'not-allowed' : 'pointer',
+            transition: 'background-color 0.2s'
+          }}
         >
           {processing ? 'Processing with AI...' : 'Extract Metadata'}
         </button>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-            <p className="text-red-800 text-sm">{error}</p>
+          <div style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '0.5rem', padding: '0.75rem' }}>
+            <p style={{ color: '#991b1b', fontSize: '0.875rem', margin: 0 }}>{error}</p>
           </div>
         )}
       </form>
 
-      <div className="mt-6">
-        <h4 className="text-sm font-medium text-gray-700 mb-2">Example Transactions:</h4>
-        <div className="space-y-2">
+      <div style={{ marginTop: '1.5rem' }}>
+        <h4 style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>Example Transactions:</h4>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           {exampleTransactions.map((example, index) => (
             <button
               key={index}
               onClick={() => setTransactionData(example)}
-              className="block w-full text-left text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-2 rounded transition-colors duration-200"
+              style={{
+                display: 'block',
+                width: '100%',
+                textAlign: 'left',
+                fontSize: '0.875rem',
+                color: '#6b7280',
+                padding: '0.5rem',
+                borderRadius: '0.25rem',
+                border: 'none',
+                backgroundColor: 'transparent',
+                cursor: processing ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s'
+              }}
               disabled={processing}
+              onMouseEnter={(e) => {
+                if (!processing) {
+                  e.currentTarget.style.color = '#2563eb';
+                  e.currentTarget.style.backgroundColor = '#eff6ff';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!processing) {
+                  e.currentTarget.style.color = '#6b7280';
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }
+              }}
             >
               {example}
             </button>

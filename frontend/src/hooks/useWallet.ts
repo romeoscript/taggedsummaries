@@ -21,7 +21,7 @@ export const useWallet = () => {
     try {
       // Check if Phantom wallet is available
       if (!window.solana || !window.solana.isPhantom) {
-        throw new Error('Phantom wallet not found. Please install Phantom wallet.');
+        throw new Error('Phantom wallet not found. Please install Phantom wallet from https://phantom.app');
       }
 
       // Connect to wallet
@@ -34,6 +34,7 @@ export const useWallet = () => {
         error: null
       });
     } catch (error) {
+      console.error('Wallet connection error:', error);
       setWalletState(prev => ({
         ...prev,
         connecting: false,
@@ -59,42 +60,48 @@ export const useWallet = () => {
   };
 
   useEffect(() => {
-    // Check if wallet is already connected
-    if (window.solana && window.solana.isConnected) {
-      setWalletState(prev => ({
-        ...prev,
-        connected: true,
-        publicKey: window.solana.publicKey?.toString() || null
-      }));
-    }
-
-    // Listen for wallet events
-    const handleAccountChange = (publicKey: any) => {
-      if (publicKey) {
+    // Check if wallet is available and already connected
+    if (window.solana) {
+      if (window.solana.isConnected && window.solana.publicKey) {
         setWalletState(prev => ({
           ...prev,
           connected: true,
-          publicKey: publicKey.toString()
+          publicKey: window.solana.publicKey.toString()
         }));
-      } else {
-        setWalletState({
-          connected: false,
-          publicKey: null,
-          connecting: false,
-          error: null
-        });
       }
-    };
 
-    if (window.solana) {
+      // Listen for wallet events
+      const handleAccountChange = (publicKey: any) => {
+        if (publicKey) {
+          setWalletState(prev => ({
+            ...prev,
+            connected: true,
+            publicKey: publicKey.toString()
+          }));
+        } else {
+          setWalletState({
+            connected: false,
+            publicKey: null,
+            connecting: false,
+            error: null
+          });
+        }
+      };
+
       window.solana.on('accountChanged', handleAccountChange);
-    }
 
-    return () => {
-      if (window.solana && window.solana.removeListener) {
-        window.solana.removeListener('accountChanged', handleAccountChange);
-      }
-    };
+      return () => {
+        if (window.solana && window.solana.removeListener) {
+          window.solana.removeListener('accountChanged', handleAccountChange);
+        }
+      };
+    } else {
+      // Wallet not available
+      setWalletState(prev => ({
+        ...prev,
+        error: 'Phantom wallet not detected. Please install Phantom wallet from https://phantom.app'
+      }));
+    }
   }, []);
 
   return {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { AIProcessingResult } from '../services/groqService';
+import type { AIProcessingResult } from '../services/groqService';
 
 interface AIResultProps {
   result: AIProcessingResult | null;
