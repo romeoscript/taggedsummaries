@@ -1,5 +1,6 @@
 import React from 'react';
 import type { AIProcessingResult } from '../services/groqService';
+import { validateAIResult } from '../utils/validation';
 
 interface AIResultProps {
   result: AIProcessingResult | null;
@@ -12,6 +13,11 @@ export const AIResult: React.FC<AIResultProps> = ({
   onStoreOnChain, 
   storing 
 }) => {
+  // Validate the AI result
+  const validation = result ? validateAIResult(result) : null;
+  const isValid = validation?.isValid ?? true;
+  const validationError = validation?.error;
+
   if (!result) {
     return (
       <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)', border: '1px solid #e5e7eb', padding: '1.5rem' }}>
@@ -61,7 +67,48 @@ export const AIResult: React.FC<AIResultProps> = ({
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">AI Analysis Result</h3>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+        <h3 className="text-lg font-semibold text-gray-900">AI Analysis Result</h3>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          {isValid ? (
+            <span style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '0.25rem', 
+              color: '#10b981', 
+              fontSize: '0.75rem', 
+              fontWeight: '500' 
+            }}>
+              ✓ Valid
+            </span>
+          ) : (
+            <span style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '0.25rem', 
+              color: '#ef4444', 
+              fontSize: '0.75rem', 
+              fontWeight: '500' 
+            }}>
+              ⚠️ Invalid
+            </span>
+          )}
+        </div>
+      </div>
+
+      {validationError && (
+        <div style={{ 
+          backgroundColor: '#fef2f2', 
+          border: '1px solid #fecaca', 
+          borderRadius: '0.5rem', 
+          padding: '0.75rem',
+          marginBottom: '1rem'
+        }}>
+          <p style={{ color: '#991b1b', fontSize: '0.875rem', margin: 0 }}>
+            <strong>Validation Error:</strong> {validationError}
+          </p>
+        </div>
+      )}
       
       <div className="space-y-4">
         {/* Summary */}
@@ -113,11 +160,22 @@ export const AIResult: React.FC<AIResultProps> = ({
         <div className="pt-4 border-t border-gray-200">
           <button
             onClick={onStoreOnChain}
-            disabled={storing}
-            className="w-full bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+            disabled={storing || !isValid}
+            className={`w-full text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 ${
+              storing || !isValid 
+                ? 'bg-gray-400 cursor-not-allowed' 
+                : 'bg-green-600 hover:bg-green-700'
+            }`}
           >
-            {storing ? 'Storing on Blockchain...' : 'Store on Solana Blockchain'}
+            {storing ? 'Storing on Blockchain...' : 
+             !isValid ? 'Fix validation errors to store' : 
+             'Store on Solana Blockchain'}
           </button>
+          {!isValid && (
+            <p style={{ color: '#6b7280', fontSize: '0.75rem', margin: '0.5rem 0 0 0', textAlign: 'center' }}>
+              Please fix the validation errors above before storing on blockchain
+            </p>
+          )}
         </div>
       </div>
     </div>

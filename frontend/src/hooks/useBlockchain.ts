@@ -38,18 +38,8 @@ export const useBlockchain = () => {
   const blockchainService = useMemo(() => {
     if (!program) return null;
     
-    const provider = new AnchorProvider(
-      connection,
-      {
-        publicKey: publicKey!,
-        signTransaction: signTransaction!,
-        signAllTransactions: signAllTransactions!,
-      },
-      { commitment: 'confirmed' }
-    );
-
-    return new BlockchainService(program, provider);
-  }, [program, connection, publicKey, signTransaction, signAllTransactions]);
+    return new BlockchainService(program);
+  }, [program]);
 
   // Check if summary store is initialized
   useEffect(() => {
@@ -61,17 +51,8 @@ export const useBlockchain = () => {
 
       try {
         setLoading(true);
-        const provider = new AnchorProvider(
-          connection,
-          {
-            publicKey,
-            signTransaction: signTransaction!,
-            signAllTransactions: signAllTransactions!,
-          },
-          { commitment: 'confirmed' }
-        );
         
-        const service = new BlockchainService(program, provider);
+        const service = new BlockchainService(program);
         const initialized = await service.isSummaryStoreInitialized();
         setIsInitialized(initialized);
         setError(null);
@@ -90,6 +71,18 @@ export const useBlockchain = () => {
   const initializeSummaryStore = async (): Promise<string> => {
     if (!blockchainService || !publicKey) {
       throw new Error('Wallet not connected');
+    }
+
+    // Prevent double initialization
+    if (isInitialized === true) {
+      console.log('Summary store already initialized, skipping...');
+      return 'already-initialized';
+    }
+
+    // Prevent concurrent initialization
+    if (loading) {
+      console.log('Initialization already in progress, skipping...');
+      return 'initialization-in-progress';
     }
 
     try {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { WalletContextProvider } from './contexts/WalletContext';
 import { WalletConnectionNew } from './components/WalletConnectionNew';
 import { TransactionInput } from './components/TransactionInput';
@@ -11,6 +11,7 @@ import './App.css';
 
 function AppContent() {
   const [aiResult, setAiResult] = useState<AIProcessingResult | null>(null);
+  const [transactionHash, setTransactionHash] = useState<string>('');
   const [storing, setStoring] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   
@@ -21,13 +22,13 @@ function AppContent() {
   const { 
     isInitialized, 
     loading: blockchainLoading, 
-    error: blockchainError,
     initializeSummaryStore,
     storeTaggedSummary 
   } = useBlockchain();
 
-  const handleProcessTransaction = (result: AIProcessingResult) => {
+  const handleProcessTransaction = (result: AIProcessingResult, hash?: string) => {
     setAiResult(result);
+    setTransactionHash(hash || '');
   };
 
   const handleStoreOnChain = async () => {
@@ -37,11 +38,12 @@ function AppContent() {
     try {
       // Check if summary store is initialized
       if (!isInitialized) {
+        console.log('Initializing summary store before storing transaction...');
         await initializeSummaryStore();
       }
       
       // Store the transaction on blockchain
-      const txSignature = await storeTaggedSummary(aiResult);
+      const txSignature = await storeTaggedSummary(aiResult, transactionHash);
       
       alert(`Transaction stored successfully on Solana blockchain!\nTransaction ID: ${txSignature}`);
       setAiResult(null); // Clear result after successful storage

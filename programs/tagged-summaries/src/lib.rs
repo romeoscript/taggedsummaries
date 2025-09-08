@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_lang::solana_program::keccak;
 
-declare_id!("F8qn46JxkYB3koH2tZc38qceCK3PHQ5PafaJR6u5AyD7");
+declare_id!("2ZQqMy6V5cZjUpU8Y5F9MoJkXBLSLR2r1GiYuotMBhZu");
 
 #[program]
 pub mod tagged_summaries {

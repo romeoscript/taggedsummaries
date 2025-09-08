@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/tagged_summaries.json`.
  */
 export type TaggedSummaries = {
-  "address": "F8qn46JxkYB3koH2tZc38qceCK3PHQ5PafaJR6u5AyD7",
+  "address": "2ZQqMy6V5cZjUpU8Y5F9MoJkXBLSLR2r1GiYuotMBhZu",
   "metadata": {
     "name": "taggedSummaries",
     "version": "0.1.0",

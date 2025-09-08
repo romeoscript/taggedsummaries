@@ -6,16 +6,16 @@ resolution = true
 skip-lint = false
 
 [programs.Devnet]
-tagged_summaries = "F8qn46JxkYB3koH2tZc38qceCK3PHQ5PafaJR6u5AyD7"
+tagged_summaries = "2ZQqMy6V5cZjUpU8Y5F9MoJkXBLSLR2r1GiYuotMBhZu"
 
 [programs.localnet]
-tagged_summaries = "F8qn46JxkYB3koH2tZc38qceCK3PHQ5PafaJR6u5AyD7"
+tagged_summaries = "2ZQqMy6V5cZjUpU8Y5F9MoJkXBLSLR2r1GiYuotMBhZu"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "localnet"
+cluster = "Devnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
