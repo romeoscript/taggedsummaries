@@ -9,6 +9,9 @@
   "instructions": [
     {
       "name": "initialize",
+      "docs": [
+        "Initialize the global summary store"
+      ],
       "discriminator": [
         175,
         175,
@@ -172,12 +175,12 @@
     {
       "code": 6000,
       "name": "TooManyTags",
-      "msg": "Too many tags (maximum 10 allowed)"
+      "msg": "Too many tags (maximum 15 allowed)"
     },
     {
       "code": 6001,
       "name": "SummaryTooLong",
-      "msg": "Summary too long (maximum 500 characters)"
+      "msg": "Summary too long (maximum 800 characters)"
     },
     {
       "code": 6002,

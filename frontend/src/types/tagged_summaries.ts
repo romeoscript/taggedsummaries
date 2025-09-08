@@ -15,6 +15,9 @@ export type TaggedSummaries = {
   "instructions": [
     {
       "name": "initialize",
+      "docs": [
+        "Initialize the global summary store"
+      ],
       "discriminator": [
         175,
         175,
@@ -27,7 +30,7 @@ export type TaggedSummaries = {
       ],
       "accounts": [
         {
-          "name": "summaryStore",
+          "name": "summary_store",
           "writable": true,
           "pda": {
             "seeds": [
@@ -58,7 +61,7 @@ export type TaggedSummaries = {
           "signer": true
         },
         {
-          "name": "systemProgram",
+          "name": "system_program",
           "address": "11111111111111111111111111111111"
         }
       ],
@@ -81,11 +84,11 @@ export type TaggedSummaries = {
       ],
       "accounts": [
         {
-          "name": "taggedSummary",
+          "name": "tagged_summary",
           "writable": true
         },
         {
-          "name": "summaryStore",
+          "name": "summary_store",
           "writable": true,
           "pda": {
             "seeds": [
@@ -116,7 +119,7 @@ export type TaggedSummaries = {
           "signer": true
         },
         {
-          "name": "systemProgram",
+          "name": "system_program",
           "address": "11111111111111111111111111111111"
         }
       ],
@@ -178,12 +181,12 @@ export type TaggedSummaries = {
     {
       "code": 6000,
       "name": "tooManyTags",
-      "msg": "Too many tags (maximum 10 allowed)"
+      "msg": "Too many tags (maximum 15 allowed)"
     },
     {
       "code": 6001,
       "name": "summaryTooLong",
-      "msg": "Summary too long (maximum 500 characters)"
+      "msg": "Summary too long (maximum 800 characters)"
     },
     {
       "code": 6002,
