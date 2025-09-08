@@ -7,6 +7,7 @@ declare_id!("F8qn46JxkYB3koH2tZc38qceCK3PHQ5PafaJR6u5AyD7");
 pub mod tagged_summaries {
     use super::*;
 
+    /// Initialize the global summary store
     pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
         let summary_store = &mut ctx.accounts.summary_store;
         summary_store.authority = ctx.accounts.authority.key();
@@ -16,8 +17,8 @@ pub mod tagged_summaries {
         Ok(())
     }
 
-       /// Store AI-generated metadata for a campus transaction
-       pub fn store_tagged_summary(
+    /// Store AI-generated metadata for a campus transaction
+    pub fn store_tagged_summary(
         ctx: Context<StoreSummary>,
         transaction_hash: String,
         summary: String,
@@ -26,8 +27,8 @@ pub mod tagged_summaries {
         confidence_score: u8,
     ) -> Result<()> {
         // Input validation
-        require!(tags.len() <= 10, ErrorCode::TooManyTags);
-        require!(summary.len() <= 500, ErrorCode::SummaryTooLong);
+        require!(tags.len() <= 15, ErrorCode::TooManyTags);
+        require!(summary.len() <= 800, ErrorCode::SummaryTooLong);
         require!(confidence_score <= 100, ErrorCode::InvalidConfidence);
         require!(transaction_hash.len() == 64, ErrorCode::InvalidHash);
 
@@ -49,7 +50,10 @@ pub mod tagged_summaries {
         summary_store.total_summaries += 1;
 
         msg!("Tagged summary stored for student: {}", ctx.accounts.student.key());
-        msg!("Category: {}, Confidence: {}%", summary_account.category, summary_account.confidence_score);
+        msg!("ID: {}, Category: {}, Confidence: {}%", 
+             summary_account.id, 
+             summary_account.category, 
+             summary_account.confidence_score);
 
         Ok(())
     }
@@ -80,16 +84,16 @@ pub struct StoreSummary<'info> {
         payer = student,
         space = 8 + // discriminator
                 8 + // id
-                4 + 64 + // transaction_hash (String with length prefix)
-                4 + 500 + // summary (String)
-                4 + (4 + 50) * 10 + // tags (Vec<String>, max 10 tags, each with length prefix)
-                4 + 50 + // category (String)
+                4 + 64 + // transaction_hash
+                4 + 800 + // summary (increased)
+                4 + (4 + 50) * 15 + // tags (15 max tags)
+                4 + 80 + // category (increased)
                 1 + // confidence_score
                 8 + // timestamp
                 32, // student_wallet
         seeds = [
             b"tagged_summary",
-            &keccak::hash(transaction_hash.as_bytes()).to_bytes()[..8], // Use first 8 bytes of hash
+            &keccak::hash(transaction_hash.as_bytes()).to_bytes()[..8],
             student.key().as_ref()
         ],
         bump
@@ -122,7 +126,7 @@ pub struct TaggedSummary {
     pub transaction_hash: String,   // SHA256 hash of original transaction
     pub summary: String,            // AI-generated summary
     pub tags: Vec<String>,          // AI-generated tags
-    pub category: String,           // Primary category (food, academic, etc.)
+    pub category: String,           // Primary category
     pub confidence_score: u8,       // AI confidence (0-100)
     pub timestamp: i64,             // When stored on blockchain
     pub student_wallet: Pubkey,     // Student who owns this data
@@ -131,10 +135,10 @@ pub struct TaggedSummary {
 // Error handling
 #[error_code]
 pub enum ErrorCode {
-    #[msg("Too many tags (maximum 10 allowed)")]
+    #[msg("Too many tags (maximum 15 allowed)")]
     TooManyTags,
     
-    #[msg("Summary too long (maximum 500 characters)")]
+    #[msg("Summary too long (maximum 800 characters)")]
     SummaryTooLong,
     
     #[msg("Invalid confidence score (0-100 only)")]
