@@ -71,7 +71,7 @@ export class BlockchainService {
         summaryStore: summaryStorePDA,
         authority: authority,
         systemProgram: web3.SystemProgram.programId,
-      })
+      } as any)
       .rpc();
 
     return tx;
@@ -124,9 +124,9 @@ export class BlockchainService {
        PROGRAM_ID
      );
 
-     // Ensure all data types are correct
+     // Ensure all data types are correct and enforce limits
      const summary = String(aiResult.summary);
-     const tags = aiResult.tags.map(tag => String(tag));
+     const tags = aiResult.tags.map(tag => String(tag)).slice(0, 15); // Enforce 15 tag limit
      const category = String(aiResult.category);
      const confidenceScore = Math.floor(Number(aiResult.confidenceScore));
 
@@ -134,9 +134,21 @@ export class BlockchainService {
        hash,
        summary: summary.substring(0, 50) + '...',
        tags,
+       tagsCount: tags.length,
        category,
        confidenceScore
      });
+
+     // Additional validation before sending to blockchain
+     if (tags.length > 15) {
+       throw new Error(`Too many tags: ${tags.length} (maximum 15 allowed)`);
+     }
+     if (summary.length > 800) {
+       throw new Error(`Summary too long: ${summary.length} characters (maximum 800)`);
+     }
+     if (confidenceScore > 100) {
+       throw new Error(`Invalid confidence score: ${confidenceScore} (maximum 100)`);
+     }
 
      console.log('   Using PDA:', taggedSummaryPDA.toString());
      console.log('   PDA derivation seeds:', [
@@ -159,7 +171,7 @@ export class BlockchainService {
            summaryStore: summaryStorePDA,
            student: student,
            systemProgram: web3.SystemProgram.programId,
-         })
+         } as any)
          .rpc();
 
        console.log('✅ Tagged summary stored:', tx);
@@ -169,6 +181,21 @@ export class BlockchainService {
        
        // Parse specific error messages from the smart contract
        if (error instanceof Error && error.message) {
+         // Check for Solana program errors (custom program error codes)
+         if (error.message.includes('custom program error: 0x0')) {
+           throw new Error('Too many tags (maximum 15 allowed)');
+         }
+         if (error.message.includes('custom program error: 0x1')) {
+           throw new Error('Summary too long (maximum 800 characters)');
+         }
+         if (error.message.includes('custom program error: 0x2')) {
+           throw new Error('Invalid confidence score (0-100 only)');
+         }
+         if (error.message.includes('custom program error: 0x3')) {
+           throw new Error('Transaction hash must be 64 characters');
+         }
+         
+         // Check for other common error patterns
          if (error.message.includes('Too many tags')) {
            throw new Error('Too many tags (maximum 15 allowed)');
          }
@@ -182,6 +209,9 @@ export class BlockchainService {
            throw new Error('Transaction hash must be 64 characters');
          }
          if (error.message.includes('already in use')) {
+           throw new Error('This transaction hash has already been used');
+         }
+         if (error.message.includes('Account already exists')) {
            throw new Error('This transaction hash has already been used');
          }
        }

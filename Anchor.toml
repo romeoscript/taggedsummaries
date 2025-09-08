@@ -15,7 +15,7 @@ tagged_summaries = "2ZQqMy6V5cZjUpU8Y5F9MoJkXBLSLR2r1GiYuotMBhZu"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Devnet"
+cluster = "localnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]

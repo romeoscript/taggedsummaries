@@ -11,7 +11,6 @@ import './App.css';
 
 function AppContent() {
   const [aiResult, setAiResult] = useState<AIProcessingResult | null>(null);
-  const [transactionHash, setTransactionHash] = useState<string>('');
   const [storing, setStoring] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   
@@ -26,9 +25,8 @@ function AppContent() {
     storeTaggedSummary 
   } = useBlockchain();
 
-  const handleProcessTransaction = (result: AIProcessingResult, hash?: string) => {
+  const handleProcessTransaction = (result: AIProcessingResult) => {
     setAiResult(result);
-    setTransactionHash(hash || '');
   };
 
   const handleStoreOnChain = async () => {
@@ -43,7 +41,7 @@ function AppContent() {
       }
       
       // Store the transaction on blockchain
-      const txSignature = await storeTaggedSummary(aiResult, transactionHash);
+      const txSignature = await storeTaggedSummary(aiResult);
       
       alert(`Transaction stored successfully on Solana blockchain!\nTransaction ID: ${txSignature}`);
       setAiResult(null); // Clear result after successful storage

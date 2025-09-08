@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { GroqAIService } from '../services/groqService';
 import type { AIProcessingResult } from '../services/groqService';
-import { validateTransactionHash, generateTransactionHash } from '../utils/validation';
+// Removed hash utilities as hash UI was removed
 
 interface TransactionInputProps {
-  onProcessTransaction: (result: AIProcessingResult, transactionHash?: string) => void;
+  onProcessTransaction: (result: AIProcessingResult) => void;
   groqApiKey: string;
 }
 
@@ -13,28 +13,10 @@ export const TransactionInput: React.FC<TransactionInputProps> = ({
   groqApiKey 
 }) => {
   const [transactionData, setTransactionData] = useState('');
-  const [transactionHash, setTransactionHash] = useState('');
-  const [useCustomHash, setUseCustomHash] = useState(false);
+  // Removed transaction hash UI/state
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [hashError, setHashError] = useState<string | null>(null);
-
-  const handleHashChange = (hash: string) => {
-    setTransactionHash(hash);
-    if (hash.trim()) {
-      const validation = validateTransactionHash(hash);
-      setHashError(validation.isValid ? null : validation.error || null);
-    } else {
-      setHashError(null);
-    }
-  };
-
-  const generateHash = () => {
-    const newHash = generateTransactionHash();
-    setTransactionHash(newHash);
-    setUseCustomHash(true);
-    setHashError(null);
-  };
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,32 +31,14 @@ export const TransactionInput: React.FC<TransactionInputProps> = ({
       return;
     }
 
-    // Validate transaction hash if custom hash is being used
-    if (useCustomHash && transactionHash.trim()) {
-      const hashValidation = validateTransactionHash(transactionHash);
-      if (!hashValidation.isValid) {
-        setHashError(hashValidation.error || 'Invalid transaction hash');
-        return;
-      }
-    }
-
     setProcessing(true);
     setError(null);
-    setHashError(null);
 
     try {
       const groqService = new GroqAIService(groqApiKey);
       const result = await groqService.extractMetadata(transactionData);
-      
-      // Use custom hash if provided, otherwise generate one
-      const finalHash = useCustomHash && transactionHash.trim() 
-        ? transactionHash 
-        : generateTransactionHash();
-      
-      onProcessTransaction(result, finalHash);
+      onProcessTransaction(result);
       setTransactionData(''); // Clear input after successful processing
-      setTransactionHash('');
-      setUseCustomHash(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to process transaction');
     } finally {
@@ -128,58 +92,7 @@ export const TransactionInput: React.FC<TransactionInputProps> = ({
           />
         </div>
 
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-            <label htmlFor="transactionHash" style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151' }}>
-              Transaction Hash (Optional)
-            </label>
-            <button
-              type="button"
-              onClick={generateHash}
-              disabled={processing}
-              style={{
-                fontSize: '0.75rem',
-                color: '#2563eb',
-                background: 'none',
-                border: 'none',
-                cursor: processing ? 'not-allowed' : 'pointer',
-                textDecoration: 'underline'
-              }}
-            >
-              Generate Random
-            </button>
-          </div>
-          <input
-            id="transactionHash"
-            type="text"
-            value={transactionHash}
-            onChange={(e) => {
-              handleHashChange(e.target.value);
-              setUseCustomHash(true);
-            }}
-            placeholder="64-character hexadecimal hash (auto-generated if empty)"
-            style={{
-              width: '100%',
-              padding: '0.5rem 0.75rem',
-              border: `1px solid ${hashError ? '#ef4444' : '#d1d5db'}`,
-              borderRadius: '0.5rem',
-              outline: 'none',
-              fontSize: '0.875rem',
-              fontFamily: 'monospace'
-            }}
-            disabled={processing}
-          />
-          {hashError && (
-            <p style={{ color: '#ef4444', fontSize: '0.75rem', margin: '0.25rem 0 0 0' }}>
-              {hashError}
-            </p>
-          )}
-          {transactionHash && !hashError && (
-            <p style={{ color: '#10b981', fontSize: '0.75rem', margin: '0.25rem 0 0 0' }}>
-              ✓ Valid transaction hash
-            </p>
-          )}
-        </div>
+        {/* Removed transaction hash UI */}
 
         <button
           type="submit"
