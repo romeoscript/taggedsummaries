@@ -30,7 +30,7 @@ export type TaggedSummaries = {
       ],
       "accounts": [
         {
-          "name": "summary_store",
+          "name": "summaryStore",
           "writable": true,
           "pda": {
             "seeds": [
@@ -61,7 +61,7 @@ export type TaggedSummaries = {
           "signer": true
         },
         {
-          "name": "system_program",
+          "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         }
       ],
@@ -84,11 +84,11 @@ export type TaggedSummaries = {
       ],
       "accounts": [
         {
-          "name": "tagged_summary",
+          "name": "taggedSummary",
           "writable": true
         },
         {
-          "name": "summary_store",
+          "name": "summaryStore",
           "writable": true,
           "pda": {
             "seeds": [
@@ -119,7 +119,7 @@ export type TaggedSummaries = {
           "signer": true
         },
         {
-          "name": "system_program",
+          "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         }
       ],
