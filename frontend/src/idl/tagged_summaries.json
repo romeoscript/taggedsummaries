@@ -1,0 +1,284 @@
+{
+  "address": "DFauwKZzbAymC7J68f2L2rL56S2t5sAboyNyvRJ82k6t",
+  "metadata": {
+    "name": "tagged_summaries",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "initialize",
+      "discriminator": [
+        175,
+        175,
+        109,
+        31,
+        13,
+        152,
+        155,
+        237
+      ],
+      "accounts": [
+        {
+          "name": "summary_store",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  117,
+                  109,
+                  109,
+                  97,
+                  114,
+                  121,
+                  95,
+                  115,
+                  116,
+                  111,
+                  114,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "store_tagged_summary",
+      "docs": [
+        "Store AI-generated metadata for a campus transaction"
+      ],
+      "discriminator": [
+        162,
+        209,
+        213,
+        124,
+        174,
+        65,
+        80,
+        198
+      ],
+      "accounts": [
+        {
+          "name": "tagged_summary",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  97,
+                  103,
+                  103,
+                  101,
+                  100,
+                  95,
+                  115,
+                  117,
+                  109,
+                  109,
+                  97,
+                  114,
+                  121
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "transaction_hash"
+              },
+              {
+                "kind": "account",
+                "path": "student"
+              }
+            ]
+          }
+        },
+        {
+          "name": "summary_store",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  117,
+                  109,
+                  109,
+                  97,
+                  114,
+                  121,
+                  95,
+                  115,
+                  116,
+                  111,
+                  114,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "student",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "transaction_hash",
+          "type": "string"
+        },
+        {
+          "name": "summary",
+          "type": "string"
+        },
+        {
+          "name": "tags",
+          "type": {
+            "vec": "string"
+          }
+        },
+        {
+          "name": "category",
+          "type": "string"
+        },
+        {
+          "name": "confidence_score",
+          "type": "u8"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "SummaryStore",
+      "discriminator": [
+        17,
+        251,
+        92,
+        202,
+        242,
+        205,
+        34,
+        113
+      ]
+    },
+    {
+      "name": "TaggedSummary",
+      "discriminator": [
+        254,
+        19,
+        124,
+        133,
+        84,
+        230,
+        133,
+        226
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "TooManyTags",
+      "msg": "Too many tags (maximum 10 allowed)"
+    },
+    {
+      "code": 6001,
+      "name": "SummaryTooLong",
+      "msg": "Summary too long (maximum 500 characters)"
+    },
+    {
+      "code": 6002,
+      "name": "InvalidConfidence",
+      "msg": "Invalid confidence score (0-100 only)"
+    },
+    {
+      "code": 6003,
+      "name": "InvalidHash",
+      "msg": "Transaction hash must be 64 characters"
+    }
+  ],
+  "types": [
+    {
+      "name": "SummaryStore",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "total_summaries",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TaggedSummary",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "u64"
+          },
+          {
+            "name": "transaction_hash",
+            "type": "string"
+          },
+          {
+            "name": "summary",
+            "type": "string"
+          },
+          {
+            "name": "tags",
+            "type": {
+              "vec": "string"
+            }
+          },
+          {
+            "name": "category",
+            "type": "string"
+          },
+          {
+            "name": "confidence_score",
+            "type": "u8"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "student_wallet",
+            "type": "pubkey"
+          }
+        ]
+      }
+    }
+  ]
+}

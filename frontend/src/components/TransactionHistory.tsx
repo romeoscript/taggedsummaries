@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
+import { useBlockchain } from '../hooks/useBlockchain';
 import type { AIProcessingResult } from '../services/groqService';
 
 interface StoredTransaction {
@@ -15,55 +16,42 @@ interface StoredTransaction {
 
 export const TransactionHistory: React.FC = () => {
   const { connected, publicKey } = useWallet();
+  const { getStudentSummaries } = useBlockchain();
   const [transactions, setTransactions] = useState<StoredTransaction[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // Mock data for demonstration
-  const mockTransactions: StoredTransaction[] = [
-    {
-      id: '1',
-      transactionHash: 'a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef12345678',
-      summary: 'Lunch at campus cafeteria',
-      tags: ['food', 'cafeteria', 'lunch', 'campus'],
-      category: 'dining',
-      confidenceScore: 95,
-      timestamp: Date.now() - 86400000, // 1 day ago
-      studentWallet: publicKey?.toString() || ''
-    },
-    {
-      id: '2',
-      transactionHash: 'b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef1234567890',
-      summary: 'Chemistry textbook purchase',
-      tags: ['textbook', 'chemistry', 'academic', 'bookstore'],
-      category: 'academic',
-      confidenceScore: 88,
-      timestamp: Date.now() - 172800000, // 2 days ago
-      studentWallet: publicKey?.toString() || ''
-    },
-    {
-      id: '3',
-      transactionHash: 'c3d4e5f6789012345678901234567890abcdef1234567890abcdef1234567890ab',
-      summary: 'Monthly bus pass renewal',
-      tags: ['transportation', 'bus', 'monthly', 'pass'],
-      category: 'transportation',
-      confidenceScore: 92,
-      timestamp: Date.now() - 259200000, // 3 days ago
-      studentWallet: publicKey?.toString() || ''
-    }
-  ];
 
   useEffect(() => {
-    if (connected && publicKey) {
-      setLoading(true);
-      // Simulate loading transactions
-      setTimeout(() => {
-        setTransactions(mockTransactions);
-        setLoading(false);
-      }, 1000);
-    } else {
-      setTransactions([]);
-    }
-  }, [connected, publicKey]);
+    const loadTransactions = async () => {
+      if (connected && publicKey) {
+        setLoading(true);
+        try {
+          // Load real transactions from blockchain
+          const realTransactions = await getStudentSummaries(publicKey);
+          setTransactions(realTransactions.map(tx => ({
+            id: tx.id.toString(),
+            transactionHash: tx.transactionHash,
+            summary: tx.summary,
+            tags: tx.tags,
+            category: tx.category,
+            confidenceScore: tx.confidenceScore,
+            timestamp: tx.timestamp,
+            studentWallet: tx.studentWallet.toString()
+          })));
+        } catch (error) {
+          console.error('Error loading transactions:', error);
+          // Set empty array on error - no fallback to mock data
+          setTransactions([]);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setTransactions([]);
+      }
+    };
+
+    loadTransactions();
+  }, [connected, publicKey]); // Removed getStudentSummaries from dependencies
 
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleDateString('en-US', {
@@ -157,9 +145,9 @@ export const TransactionHistory: React.FC = () => {
         </div>
       ) : transactions.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '2rem 0' }}>
-          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📝</div>
+          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🔗</div>
           <p style={{ color: '#6b7280', fontSize: '0.875rem', margin: 0 }}>
-            No transactions found. Analyze some transactions to see them here!
+            No blockchain transactions found. Process and store some transactions to see them here!
           </p>
         </div>
       ) : (
