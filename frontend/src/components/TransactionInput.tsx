@@ -43,13 +43,6 @@ export const TransactionInput: React.FC<TransactionInputProps> = ({
     }
   };
 
-  const exampleTransactions = [
-    "Student meal purchase at campus cafeteria - $12.50 for lunch combo",
-    "Book purchase at campus bookstore - $45.00 for Chemistry textbook",
-    "Bus pass renewal - $25.00 for monthly student transit",
-    "Coffee at campus Starbucks - $4.75 for grande latte",
-    "Movie ticket at campus theater - $8.50 for student discount"
-  ];
 
   return (
     <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)', border: '1px solid #e5e7eb', padding: '1.5rem' }}>
@@ -121,45 +114,6 @@ export const TransactionInput: React.FC<TransactionInputProps> = ({
         )}
       </form>
 
-      <div style={{ marginTop: '1.5rem' }}>
-        <h4 style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>💡 Try these examples:</h4>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          {exampleTransactions.map((example, index) => (
-            <button
-              key={index}
-              onClick={() => setTransactionData(example)}
-              style={{
-                display: 'block',
-                width: '100%',
-                textAlign: 'left',
-                fontSize: '0.875rem',
-                color: '#6b7280',
-                padding: '0.5rem',
-                borderRadius: '0.25rem',
-                border: 'none',
-                backgroundColor: 'transparent',
-                cursor: processing ? 'not-allowed' : 'pointer',
-                transition: 'all 0.2s'
-              }}
-              disabled={processing}
-              onMouseEnter={(e) => {
-                if (!processing) {
-                  e.currentTarget.style.color = '#2563eb';
-                  e.currentTarget.style.backgroundColor = '#eff6ff';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!processing) {
-                  e.currentTarget.style.color = '#6b7280';
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                }
-              }}
-            >
-              {example}
-            </button>
-          ))}
-        </div>
-      </div>
     </div>
   );
 };
