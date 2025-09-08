@@ -80,9 +80,9 @@ pub struct StoreSummary<'info> {
         payer = student,
         space = 8 + // discriminator
                 8 + // id
-                64 + // transaction_hash
+                4 + 64 + // transaction_hash (String with length prefix)
                 4 + 500 + // summary (String)
-                4 + (32 * 10) + // tags (Vec<String>, max 10 tags)
+                4 + (4 + 50) * 10 + // tags (Vec<String>, max 10 tags, each with length prefix)
                 4 + 50 + // category (String)
                 1 + // confidence_score
                 8 + // timestamp

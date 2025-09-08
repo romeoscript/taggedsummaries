@@ -119,7 +119,7 @@ export const ContractStatus: React.FC = () => {
         <div>
           <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: '#111827', margin: 0 }}>Contract Status</h3>
           <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: 0 }}>
-            Program ID: DFauwKZzbAymC7J68f2L2rL56S2t5sAboyNyvRJ82k6t
+            Program ID: F8qn46JxkYB3koH2tZc38qceCK3PHQ5PafaJR6u5AyD7
           </p>
         </div>
       </div>
