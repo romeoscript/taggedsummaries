@@ -53,18 +53,35 @@ export const TransactionInput: React.FC<TransactionInputProps> = ({
 
   return (
     <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)', border: '1px solid #e5e7eb', padding: '1.5rem' }}>
-      <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: '#111827', margin: '0 0 1rem 0' }}>Process Campus Transaction</h3>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+        <div style={{ 
+          width: '2rem', 
+          height: '2rem', 
+          backgroundColor: '#dbeafe', 
+          borderRadius: '50%', 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          fontSize: '1rem'
+        }}>
+          🤖
+        </div>
+        <div>
+          <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: '#111827', margin: 0 }}>AI Transaction Analyzer</h3>
+          <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: 0 }}>Describe your campus transaction and get AI-powered insights</p>
+        </div>
+      </div>
       
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <div>
           <label htmlFor="transaction" style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
-            Transaction Description
+            What did you buy or do on campus?
           </label>
           <textarea
             id="transaction"
             value={transactionData}
             onChange={(e) => setTransactionData(e.target.value)}
-            placeholder="Enter your campus transaction details..."
+            placeholder="e.g., Bought lunch at the campus cafeteria for $12.50..."
             style={{
               width: '100%',
               padding: '0.5rem 0.75rem',
@@ -94,7 +111,7 @@ export const TransactionInput: React.FC<TransactionInputProps> = ({
             transition: 'background-color 0.2s'
           }}
         >
-          {processing ? 'Processing with AI...' : 'Extract Metadata'}
+          {processing ? '🔄 Analyzing with AI...' : '🚀 Analyze Transaction'}
         </button>
 
         {error && (
@@ -105,7 +122,7 @@ export const TransactionInput: React.FC<TransactionInputProps> = ({
       </form>
 
       <div style={{ marginTop: '1.5rem' }}>
-        <h4 style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>Example Transactions:</h4>
+        <h4 style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>💡 Try these examples:</h4>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           {exampleTransactions.map((example, index) => (
             <button

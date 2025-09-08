@@ -14,15 +14,27 @@ export const AIResult: React.FC<AIResultProps> = ({
 }) => {
   if (!result) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">AI Analysis Result</h3>
-        <div className="text-center py-8">
-          <div className="text-gray-400 mb-2">
-            <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-            </svg>
+      <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)', border: '1px solid #e5e7eb', padding: '1.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+          <div style={{ 
+            width: '2rem', 
+            height: '2rem', 
+            backgroundColor: '#f3f4f6', 
+            borderRadius: '50%', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            fontSize: '1rem'
+          }}>
+            📊
           </div>
-          <p className="text-gray-500">Process a transaction to see AI analysis results</p>
+          <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: '#111827', margin: 0 }}>AI Analysis Results</h3>
+        </div>
+        <div style={{ textAlign: 'center', padding: '2rem 0' }}>
+          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🤖</div>
+          <p style={{ color: '#6b7280', fontSize: '0.875rem', margin: 0 }}>
+            Analyze a transaction above to see AI-powered insights and metadata extraction
+          </p>
         </div>
       </div>
     );
