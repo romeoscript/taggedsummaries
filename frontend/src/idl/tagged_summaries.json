@@ -1,5 +1,5 @@
 {
-  "address": "DFauwKZzbAymC7J68f2L2rL56S2t5sAboyNyvRJ82k6t",
+  "address": "F8qn46JxkYB3koH2tZc38qceCK3PHQ5PafaJR6u5AyD7",
   "metadata": {
     "name": "tagged_summaries",
     "version": "0.1.0",
@@ -76,38 +76,7 @@
       "accounts": [
         {
           "name": "tagged_summary",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  116,
-                  97,
-                  103,
-                  103,
-                  101,
-                  100,
-                  95,
-                  115,
-                  117,
-                  109,
-                  109,
-                  97,
-                  114,
-                  121
-                ]
-              },
-              {
-                "kind": "arg",
-                "path": "transaction_hash"
-              },
-              {
-                "kind": "account",
-                "path": "student"
-              }
-            ]
-          }
+          "writable": true
         },
         {
           "name": "summary_store",

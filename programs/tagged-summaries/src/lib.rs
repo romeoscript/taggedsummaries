@@ -1,6 +1,7 @@
 use anchor_lang::prelude::*;
+use anchor_lang::solana_program::keccak;
 
-declare_id!("DFauwKZzbAymC7J68f2L2rL56S2t5sAboyNyvRJ82k6t");
+declare_id!("F8qn46JxkYB3koH2tZc38qceCK3PHQ5PafaJR6u5AyD7");
 
 #[program]
 pub mod tagged_summaries {
@@ -88,7 +89,7 @@ pub struct StoreSummary<'info> {
                 32, // student_wallet
         seeds = [
             b"tagged_summary",
-            transaction_hash.as_bytes(),
+            &keccak::hash(transaction_hash.as_bytes()).to_bytes()[..8], // Use first 8 bytes of hash
             student.key().as_ref()
         ],
         bump

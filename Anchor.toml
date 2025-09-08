@@ -6,7 +6,7 @@ resolution = true
 skip-lint = false
 
 [programs.Devnet]
-tagged_summaries = "DFauwKZzbAymC7J68f2L2rL56S2t5sAboyNyvRJ82k6t"
+tagged_summaries = "F8qn46JxkYB3koH2tZc38qceCK3PHQ5PafaJR6u5AyD7"
 
 [registry]
 url = "https://api.apr.dev"

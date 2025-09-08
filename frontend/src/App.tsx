@@ -4,6 +4,7 @@ import { WalletConnectionNew } from './components/WalletConnectionNew';
 import { TransactionInput } from './components/TransactionInput';
 import { AIResult } from './components/AIResult';
 import { TransactionHistory } from './components/TransactionHistory';
+import { ContractStatus } from './components/ContractStatus';
 import { useBlockchain } from './hooks/useBlockchain';
 import type { AIProcessingResult } from './services/groqService';
 import './App.css';
@@ -11,6 +12,7 @@ import './App.css';
 function AppContent() {
   const [aiResult, setAiResult] = useState<AIProcessingResult | null>(null);
   const [storing, setStoring] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   
   // Get Groq API key from environment variables
   const groqApiKey = import.meta.env.VITE_GROQ_API_KEY;
@@ -43,6 +45,9 @@ function AppContent() {
       
       alert(`Transaction stored successfully on Solana blockchain!\nTransaction ID: ${txSignature}`);
       setAiResult(null); // Clear result after successful storage
+      
+      // Trigger refresh of transaction history
+      setRefreshTrigger(prev => prev + 1);
     } catch (error) {
       console.error('Error storing on blockchain:', error);
       alert(`Failed to store transaction on blockchain: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -120,6 +125,9 @@ function AppContent() {
           )}
         </div>
 
+        {/* Contract Status */}
+        <ContractStatus />
+
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
           {/* Left Column - Transaction Analyzer */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -136,7 +144,7 @@ function AppContent() {
 
           {/* Right Column - Transaction History */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            <TransactionHistory />
+            <TransactionHistory refreshTrigger={refreshTrigger} />
           </div>
         </div>
         </main>

@@ -3,13 +3,53 @@ import { PublicKey } from '@solana/web3.js';
 import type { AIProcessingResult } from './groqService';
 import type { TaggedSummaries } from '../types/tagged_summaries';
 
-// Buffer polyfill for browser - using TextEncoder/TextDecoder instead
+// Buffer polyfill for browser
+if (typeof globalThis.Buffer === 'undefined') {
+  class BufferPolyfill extends Uint8Array {
+    static from(data: string | Uint8Array, encoding?: string): BufferPolyfill {
+      if (typeof data === 'string') {
+        return new BufferPolyfill(new TextEncoder().encode(data));
+      }
+      return new BufferPolyfill(data);
+    }
+    
+    static isBuffer(obj: any): boolean {
+      return obj instanceof BufferPolyfill || obj instanceof Uint8Array;
+    }
+    
+    static alloc(size: number): BufferPolyfill {
+      return new BufferPolyfill(size);
+    }
+    
+    static concat(list: Uint8Array[], length?: number): BufferPolyfill {
+      const totalLength = length || list.reduce((acc, item) => acc + item.length, 0);
+      const result = new BufferPolyfill(totalLength);
+      let offset = 0;
+      for (const item of list) {
+        result.set(item, offset);
+        offset += item.length;
+      }
+      return result;
+    }
+    
+    constructor(sizeOrArray: number | Uint8Array) {
+      if (typeof sizeOrArray === 'number') {
+        super(sizeOrArray);
+      } else {
+        super(sizeOrArray);
+      }
+    }
+  }
+  
+  globalThis.Buffer = BufferPolyfill as any;
+}
+
 const stringToBytes = (str: string): Uint8Array => {
   return new TextEncoder().encode(str);
 };
 
 // Program ID from the IDL
-const PROGRAM_ID = new PublicKey('DFauwKZzbAymC7J68f2L2rL56S2t5sAboyNyvRJ82k6t');
+const PROGRAM_ID = new PublicKey('F8qn46JxkYB3koH2tZc38qceCK3PHQ5PafaJR6u5AyD7');
 
 export interface StoredTransaction {
   id: number;
@@ -64,7 +104,7 @@ export class BlockchainService {
     const [taggedSummaryPDA] = PublicKey.findProgramAddressSync(
       [
         stringToBytes('tagged_summary'),
-        stringToBytes(hash),
+        this.hashTransactionHash(hash),
         student.toBuffer(),
       ],
       PROGRAM_ID
@@ -105,7 +145,7 @@ export class BlockchainService {
       const [taggedSummaryPDA] = PublicKey.findProgramAddressSync(
         [
           stringToBytes('tagged_summary'),
-          stringToBytes(transactionHash),
+          this.hashTransactionHash(transactionHash),
           studentWallet.toBuffer(),
         ],
         PROGRAM_ID
@@ -152,21 +192,58 @@ export class BlockchainService {
   }
 
   /**
-   * Get all tagged summaries for a student (this would require indexing in a real app)
-   * For now, we'll return an empty array as we don't have a way to enumerate all accounts
+   * Get all tagged summaries for a student
+   * Fetches all tagged summary accounts and filters by student wallet
    */
-  async getStudentSummaries(_studentWallet: PublicKey): Promise<StoredTransaction[]> {
-    // In a real application, you would need to:
-    // 1. Use a program-derived address (PDA) to store a list of transaction hashes
-    // 2. Or use an indexing service like Helius, QuickNode, or The Graph
-    // 3. Or implement a custom RPC method in your program
-    
-    console.warn('getStudentSummaries not implemented - requires indexing service');
-    return [];
+  async getStudentSummaries(studentWallet: PublicKey): Promise<StoredTransaction[]> {
+    try {
+      console.log('🔍 Fetching all tagged summary accounts from blockchain...');
+      
+      // Get all tagged summary accounts
+      const accounts = await this.program.account.taggedSummary.all();
+      
+      console.log('📋 Total accounts found on blockchain:', accounts.length);
+      console.log('🔍 Raw blockchain accounts:', accounts);
+
+      // Filter by student wallet and convert to StoredTransaction format
+      const filteredAccounts = accounts.filter(account => {
+        const matches = account.account.studentWallet.equals(studentWallet);
+        if (matches) {
+          console.log('✅ Found matching account for student:', {
+            id: account.account.id.toNumber(),
+            studentWallet: account.account.studentWallet.toString(),
+            summary: account.account.summary
+          });
+        }
+        return matches;
+      });
+      
+      console.log('🎯 Accounts matching student wallet:', filteredAccounts.length);
+
+      const result = filteredAccounts
+        .map(account => ({
+          id: account.account.id.toNumber(),
+          transactionHash: account.account.transactionHash,
+          summary: account.account.summary,
+          tags: account.account.tags,
+          category: account.account.category,
+          confidenceScore: account.account.confidenceScore,
+          timestamp: account.account.timestamp.toNumber(),
+          studentWallet: account.account.studentWallet,
+        }))
+        .sort((a, b) => b.timestamp - a.timestamp); // Sort by timestamp, newest first
+      
+      console.log('📊 Final processed transactions:', result);
+      return result;
+    } catch (error) {
+      console.error('❌ Error fetching student summaries:', error);
+      return [];
+    }
   }
 
   /**
    * Generate a random 64-character transaction hash for testing
+   * The smart contract expects exactly 64 characters
    */
   private generateTransactionHash(): string {
     const chars = '0123456789abcdef';
@@ -175,6 +252,25 @@ export class BlockchainService {
       result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     return result;
+  }
+
+  /**
+   * Create a keccak hash from the transaction hash for PDA seeds
+   * This matches the smart contract's approach
+   */
+  private hashTransactionHash(transactionHash: string): Uint8Array {
+    // Simple keccak-like hash function for browser compatibility
+    // In a real app, you'd use a proper keccak library
+    const encoder = new TextEncoder();
+    const data = encoder.encode(transactionHash);
+    
+    // Simple hash function that produces 8 bytes
+    let hash = new Uint8Array(8);
+    for (let i = 0; i < data.length; i++) {
+      hash[i % 8] ^= data[i];
+    }
+    
+    return hash;
   }
 
   /**

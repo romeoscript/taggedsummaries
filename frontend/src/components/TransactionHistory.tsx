@@ -14,7 +14,11 @@ interface StoredTransaction {
   studentWallet: string;
 }
 
-export const TransactionHistory: React.FC = () => {
+interface TransactionHistoryProps {
+  refreshTrigger?: number; // Optional prop to trigger refresh
+}
+
+export const TransactionHistory: React.FC<TransactionHistoryProps> = ({ refreshTrigger }) => {
   const { connected, publicKey } = useWallet();
   const { getStudentSummaries } = useBlockchain();
   const [transactions, setTransactions] = useState<StoredTransaction[]>([]);
@@ -26,9 +30,15 @@ export const TransactionHistory: React.FC = () => {
       if (connected && publicKey) {
         setLoading(true);
         try {
+          console.log('🔄 Loading transactions for wallet:', publicKey.toString());
+          
           // Load real transactions from blockchain
           const realTransactions = await getStudentSummaries(publicKey);
-          setTransactions(realTransactions.map(tx => ({
+          
+          console.log('📊 Raw blockchain data:', realTransactions);
+          console.log('📈 Number of transactions found:', realTransactions.length);
+          
+          const formattedTransactions = realTransactions.map(tx => ({
             id: tx.id.toString(),
             transactionHash: tx.transactionHash,
             summary: tx.summary,
@@ -37,9 +47,13 @@ export const TransactionHistory: React.FC = () => {
             confidenceScore: tx.confidenceScore,
             timestamp: tx.timestamp,
             studentWallet: tx.studentWallet.toString()
-          })));
+          }));
+          
+          console.log('✨ Formatted transactions for display:', formattedTransactions);
+          
+          setTransactions(formattedTransactions);
         } catch (error) {
-          console.error('Error loading transactions:', error);
+          console.error('❌ Error loading transactions:', error);
           // Set empty array on error - no fallback to mock data
           setTransactions([]);
         } finally {
@@ -51,7 +65,7 @@ export const TransactionHistory: React.FC = () => {
     };
 
     loadTransactions();
-  }, [connected, publicKey]); // Removed getStudentSummaries from dependencies
+  }, [connected, publicKey, refreshTrigger]); // Added refreshTrigger to dependencies
 
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleDateString('en-US', {
